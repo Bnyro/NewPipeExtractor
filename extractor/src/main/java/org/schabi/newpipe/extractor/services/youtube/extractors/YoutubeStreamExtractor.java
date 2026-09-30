@@ -75,6 +75,8 @@ import org.schabi.newpipe.extractor.stream.AudioStream;
 import org.schabi.newpipe.extractor.stream.DeliveryMethod;
 import org.schabi.newpipe.extractor.stream.Description;
 import org.schabi.newpipe.extractor.stream.Frameset;
+import org.schabi.newpipe.extractor.stream.InfoCard;
+import org.schabi.newpipe.extractor.stream.InfoCardPosition;
 import org.schabi.newpipe.extractor.stream.Stream;
 import org.schabi.newpipe.extractor.stream.StreamExtractor;
 import org.schabi.newpipe.extractor.stream.StreamSegment;
@@ -228,7 +230,7 @@ public class YoutubeStreamExtractor extends StreamExtractor {
                 .or(() -> parseOptionalDate(dateText, "dd MMM yyyy"))
                 .map(date -> new DateWrapper(date.atStartOfDay(), true))
                 .orElseThrow(() ->
-                    new ParsingException("Could not parse upload date \"" + dateText + "\""));
+                        new ParsingException("Could not parse upload date \"" + dateText + "\""));
     }
 
     private Optional<LocalDate> parseOptionalDate(final String date, final String pattern) {
@@ -1521,6 +1523,31 @@ public class YoutubeStreamExtractor extends StreamExtractor {
                 .getObject("results")
                 .getObject("results")
                 .getArray("contents"));
+    }
+
+    @Nonnull
+    @Override
+    public List<InfoCard> getInfoCards() throws ExtractionException {
+        final JsonArray endScreenElements = playerResponse.getObject("endscreen")
+                .getObject("endscreenRenderer")
+                .getArray("elements");
+
+        return endScreenElements.streamAsJsonObjects().map(endScreenElement -> {
+            final JsonObject endScreenRenderer = endScreenElement
+                    .getObject("endscreenElementRenderer");
+            final InfoCardPosition position = new InfoCardPosition(
+                    endScreenRenderer.getDouble("left"),
+                    endScreenRenderer.getDouble("top"),
+                    endScreenRenderer.getDouble("width"),
+                    endScreenRenderer.getDouble("aspectRatio")
+            );
+
+            return new InfoCard(
+                    position,
+                    Integer.parseInt(endScreenRenderer.getString("startMs")),
+                    Integer.parseInt(endScreenRenderer.getString("endMs"))
+            );
+        }).toList();
     }
 
     /**

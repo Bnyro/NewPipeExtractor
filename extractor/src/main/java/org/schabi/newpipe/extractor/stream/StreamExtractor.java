@@ -593,6 +593,17 @@ public abstract class StreamExtractor extends Extractor {
         return ContentAvailability.UNKNOWN;
     }
 
+    /**
+     * Should return a list of InfoCard objects that contain information to show during video
+     * playback.
+     *
+     * @return list of info cards to show during the video or empty if not supported
+     */
+    @Nonnull
+    public List<InfoCard> getInfoCards() throws ExtractionException {
+        return Collections.emptyList();
+    }
+
     public enum Privacy {
         PUBLIC,
         UNLISTED,

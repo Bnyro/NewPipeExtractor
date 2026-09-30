@@ -356,6 +356,11 @@ public class StreamInfo extends Info {
         } catch (final Exception e) {
             streamInfo.addError(e);
         }
+        try {
+            streamInfo.setInfoCards(extractor.getInfoCards());
+        } catch (final Exception e) {
+            streamInfo.addError(e);
+        }
 
         streamInfo.setRelatedItems(ExtractorHelper.getRelatedItemsOrLogError(streamInfo,
                 extractor));
@@ -414,6 +419,12 @@ public class StreamInfo extends Info {
      * Preview frames, e.g. for the storyboard / seekbar thumbnail preview
      */
     private List<Frameset> previewFrames = List.of();
+
+    /**
+     * Cards to be shown at a specific point in time of the video, e.g. videos or channels to watch
+     * next.
+     */
+    public List<InfoCard> infoCards = List.of();
 
     /**
      * Get the stream type
@@ -763,5 +774,14 @@ public class StreamInfo extends Info {
 
     public void setContentAvailability(@Nonnull final ContentAvailability availability) {
         this.contentAvailability = availability;
+    }
+
+    @Nonnull
+    public List<InfoCard> getInfoCards() {
+        return infoCards;
+    }
+
+    public void setInfoCards(@Nonnull final List<InfoCard> infoCards) {
+        this.infoCards = infoCards;
     }
 }
